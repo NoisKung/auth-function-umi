@@ -137,6 +137,8 @@ namespace AuthFunction.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
+                    await AddRoleToUser(user, Input.Role);
+
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -192,5 +194,15 @@ namespace AuthFunction.Areas.Identity.Pages.Account
             }
             return (IUserEmailStore<IdentityUser>)_userStore;
         }
+
+        private async Task AddRoleToUser(IdentityUser user, string role)
+        {
+            if (!string.IsNullOrEmpty(role) && await _roleManager.RoleExistsAsync(role))
+            {
+                await _userManager.AddToRoleAsync(user, role);
+            }
+        }
+
+
     }
 }
